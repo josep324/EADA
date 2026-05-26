@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Debat</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        input[type="text"] {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+        }
+        .time-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            font-variant-numeric: tabular-nums;
+        }
+        .interventions {
+            font-size: 20px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .interventions span {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 24px;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+            color: white;
+        }
+        .btn-start { background-color: #2ecc71; }
+        .btn-start:hover { background-color: #27ae60; }
+        .btn-pause { background-color: #f1c40f; color: #333; }
+        .btn-pause:hover { background-color: #f39c12; }
+        .btn-reset { background-color: #95a5a6; }
+        .btn-reset:hover { background-color: #7f8c8d; }
+        .btn-add { background-color: #3498db; width: 100%; margin-top: 10px; font-size: 16px; padding: 12px;}
+        .btn-add:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Control d'Intervenció</h2>
+        
+        <input type="text" placeholder="Escriu el nom de la persona..." id="nomPersona">
+        
+        <div class="interventions">
+            Intervencions: <span id="comptadorIntervencions">0</span>
+        </div>
+
+        <div class="time-display" id="temps">00:00</div>
+
+        <div class="btn-group">
+            <button class="btn-start" onclick="iniciarTemps()">▶ Iniciar</button>
+            <button class="btn-pause" onclick="pausarTemps()">⏸ Pausar</button>
+            <button class="btn-reset" onclick="reiniciarTemps()">⏹ Posar a zero</button>
+        </div>
+
+        <button class="btn-add" onclick="novaIntervencio()">➕ Sumar Intervenció</button>
+    </div>
+
+    <script>
+        let timer;
+        let minuts = 0;
+        let segons = 0;
+        let enMarxa = false;
+        let intervencions = 0;
+
+        // Funció per actualitzar el text del rellotge
+        function actualitzarPantalla() {
+            let m = minuts < 10 ? "0" + minuts : minuts;
+            let s = segons < 10 ? "0" + segons : segons;
+            document.getElementById("temps").innerText = m + ":" + s;
+        }
+
+        // Funció per iniciar el cronòmetre
+        function iniciarTemps() {
+            if (!enMarxa) {
+                enMarxa = true;
+                timer = setInterval(() => {
+                    segons++;
+                    if (segons === 60) {
+                        minuts++;
+                        segons = 0;
+                    }
+                    actualitzarPantalla();
+                }, 1000);
+            }
+        }
+
+        // Funció per pausar
+        function pausarTemps() {
+            enMarxa = false;
+            clearInterval(timer);
+        }
+
+        // Funció per posar el temps a zero
+        function reiniciarTemps() {
+            pausarTemps();
+            minuts = 0;
+            segons = 0;
+            actualitzarPantalla();
+        }
+
+        // Funció per afegir una intervenció i posar el temps a zero per al nou torn
+        function novaIntervencio() {
+            intervencions++;
+            document.getElementById("comptadorIntervencions").innerText = intervencions;
+            reiniciarTemps(); // Opcional: reinicia el rellotge cada vegada que parlen de nou
+        }
+    </script>
+
+</body>
+</html>
