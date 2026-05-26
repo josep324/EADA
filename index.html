@@ -218,4 +218,74 @@
             document.getElementById("contenidorParticipants").insertAdjacentHTML('beforeend', targetaHTML);
             
             // Netegem l'input per al següent nom
-            input.value =
+            input.value = "";
+        }
+
+        // Funció per sumar o restar intervencions
+        function modificarIntervencio(id, valor) {
+            let p = participants[id];
+            p.intervencions += valor;
+            
+            // Evitem que el comptador sigui negatiu
+            if (p.intervencions < 0) p.intervencions = 0;
+            
+            document.getElementById(`int_${id}`).innerText = p.intervencions;
+
+            // Opcional: Si es suma una intervenció, posem el rellotge a zero preparat pel nou torn
+            if (valor > 0) {
+                reiniciarTemps(id);
+            }
+        }
+
+        // Actualitza el text del cronòmetre d'un participant concret
+        function actualitzarPantalla(id) {
+            let p = participants[id];
+            let m = p.minuts < 10 ? "0" + p.minuts : p.minuts;
+            let s = p.segons < 10 ? "0" + p.segons : p.segons;
+            document.getElementById(`temps_${id}`).innerText = m + ":" + s;
+        }
+
+        // Inicia el cronòmetre d'un participant concret
+        function iniciarTemps(id) {
+            let p = participants[id];
+            if (!p.enMarxa) {
+                p.enMarxa = true;
+                p.timer = setInterval(() => {
+                    p.segons++;
+                    if (p.segons === 60) {
+                        p.minuts++;
+                        p.segons = 0;
+                    }
+                    actualitzarPantalla(id);
+                }, 1000);
+            }
+        }
+
+        // Pausa el temps
+        function pausarTemps(id) {
+            let p = participants[id];
+            p.enMarxa = false;
+            clearInterval(p.timer);
+        }
+
+        // Posa el rellotge a zero
+        function reiniciarTemps(id) {
+            let p = participants[id];
+            pausarTemps(id);
+            p.minuts = 0;
+            p.segons = 0;
+            actualitzarPantalla(id);
+        }
+
+        // Elimina completament un participant
+        function eliminarParticipant(id) {
+            if (confirm(`Segur que vols eliminar a ${participants[id].nom}?`)) {
+                pausarTemps(id); // Aturem el timer si estava corrent
+                delete participants[id]; // Esborrem de les dades
+                document.getElementById(`card_${id}`).remove(); // Esborrem de la pantalla
+            }
+        }
+    </script>
+
+</body>
+</html>
