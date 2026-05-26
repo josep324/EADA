@@ -3,69 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Debat</title>
+    <title>Control de Debat Multi-Persona</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: #f0f3f5;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .card {
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        /* Zona per afegir participants */
+        .creator-box {
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 350px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 30px;
+            box-sizing: border-box;
         }
-        h2 {
-            margin-top: 0;
-            color: #333;
-        }
-        input[type="text"] {
-            width: 90%;
+        .creator-box input {
+            flex-grow: 1;
             padding: 10px;
-            margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 16px;
-            text-align: center;
         }
-        .time-display {
-            font-size: 48px;
+        .btn-add-person {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-add-person:hover { background-color: #27ae60; }
+
+        /* Contenidor de les targetes de debat */
+        .participants-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Targeta de cada participant */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-align: center;
+            position: relative;
+            border-top: 5px solid #3498db;
+        }
+        .btn-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: #95a5a6;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn-delete:hover { color: #e74c3c; }
+
+        .participant-name {
+            font-size: 22px;
             font-weight: bold;
             color: #2c3e50;
-            margin: 20px 0;
-            font-variant-numeric: tabular-nums;
+            margin: 5px 0 15px 0;
+            word-wrap: break-word;
         }
-        .interventions {
-            font-size: 20px;
-            color: #555;
-            margin-bottom: 20px;
+
+        /* Secció comptador d'intervencions */
+        .intervention-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
         }
-        .interventions span {
+        .intervention-label {
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+        .intervention-count {
+            font-size: 26px;
             font-weight: bold;
-            color: #e74c3c;
-            font-size: 24px;
+            color: #2c3e50;
+            min-width: 30px;
+        }
+        .btn-int {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-int-plus { background-color: #3498db; }
+        .btn-int-plus:hover { background-color: #2980b9; }
+        .btn-int-minus { background-color: #e67e22; }
+        .btn-int-minus:hover { background-color: #d35400; }
+
+        /* Secció Temps */
+        .time-display {
+            font-size: 40px;
+            font-weight: bold;
+            color: #34495e;
+            margin: 10px 0;
+            font-variant-numeric: tabular-nums;
         }
         .btn-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
+            gap: 5px;
             justify-content: center;
         }
-        button {
-            padding: 10px 15px;
+        .btn-ctrl {
+            padding: 8px 12px;
             border: none;
-            border-radius: 6px;
-            font-size: 14px;
+            border-radius: 4px;
+            font-size: 12px;
             cursor: pointer;
             font-weight: bold;
-            transition: background 0.2s;
             color: white;
         }
         .btn-start { background-color: #2ecc71; }
@@ -74,82 +156,66 @@
         .btn-pause:hover { background-color: #f39c12; }
         .btn-reset { background-color: #95a5a6; }
         .btn-reset:hover { background-color: #7f8c8d; }
-        .btn-add { background-color: #3498db; width: 100%; margin-top: 10px; font-size: 16px; padding: 12px;}
-        .btn-add:hover { background-color: #2980b9; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>Control d'Intervenció</h2>
-        
-        <input type="text" placeholder="Escriu el nom de la persona..." id="nomPersona">
-        
-        <div class="interventions">
-            Intervencions: <span id="comptadorIntervencions">0</span>
-        </div>
-
-        <div class="time-display" id="temps">00:00</div>
-
-        <div class="btn-group">
-            <button class="btn-start" onclick="iniciarTemps()">▶ Iniciar</button>
-            <button class="btn-pause" onclick="pausarTemps()">⏸ Pausar</button>
-            <button class="btn-reset" onclick="reiniciarTemps()">⏹ Posar a zero</button>
-        </div>
-
-        <button class="btn-add" onclick="novaIntervencio()">➕ Sumar Intervenció</button>
+    <h1>Control de Debat</h1>
+    
+    <div class="creator-box">
+        <input type="text" id="inputNom" placeholder="Nom del nou participant..." onkeypress="if(event.key === 'Enter') afegirParticipant()">
+        <button class="btn-add-person" onclick="afegirParticipant()">➕ Afegir</button>
     </div>
 
+    <div class="participants-container" id="contenidorParticipants"></div>
+
     <script>
-        let timer;
-        let minuts = 0;
-        let segons = 0;
-        let enMarxa = false;
-        let intervencions = 0;
+        // Objecte global per guardar l'estat de cada participant
+        let participants = {};
 
-        // Funció per actualitzar el text del rellotge
-        function actualitzarPantalla() {
-            let m = minuts < 10 ? "0" + minuts : minuts;
-            let s = segons < 10 ? "0" + segons : segons;
-            document.getElementById("temps").innerText = m + ":" + s;
-        }
+        function afegirParticipant() {
+            let input = document.getElementById("inputNom");
+            let nom = input.value.trim();
+            
+            if (nom === "") return;
 
-        // Funció per iniciar el cronòmetre
-        function iniciarTemps() {
-            if (!enMarxa) {
-                enMarxa = true;
-                timer = setInterval(() => {
-                    segons++;
-                    if (segons === 60) {
-                        minuts++;
-                        segons = 0;
-                    }
-                    actualitzarPantalla();
-                }, 1000);
-            }
-        }
+            // Generem una ID única basada en el temps actual
+            let id = "p_" + Date.now();
 
-        // Funció per pausar
-        function pausarTemps() {
-            enMarxa = false;
-            clearInterval(timer);
-        }
+            // Guardem les dades en l'objecte
+            participants[id] = {
+                nom: nom,
+                minuts: 0,
+                segons: 0,
+                intervencions: 0,
+                timer: null,
+                enMarxa: false
+            };
 
-        // Funció per posar el temps a zero
-        function reiniciarTemps() {
-            pausarTemps();
-            minuts = 0;
-            segons = 0;
-            actualitzarPantalla();
-        }
+            // Creem l'estructura HTML de la targeta
+            let targetaHTML = `
+                <div class="card" id="card_${id}">
+                    <button class="btn-delete" onclick="eliminarParticipant('${id}')">❌</button>
+                    <div class="participant-name">${nom}</div>
+                    
+                    <div class="intervention-section">
+                        <span class="intervention-label">Intervencions:</span>
+                        <button class="btn-int btn-int-minus" onclick="modificarIntervencio('${id}', -1)">-</button>
+                        <span class="intervention-count" id="int_${id}">0</span>
+                        <button class="btn-int btn-int-plus" onclick="modificarIntervencio('${id}', 1)">+</button>
+                    </div>
 
-        // Funció per afegir una intervenció i posar el temps a zero per al nou torn
-        function novaIntervencio() {
-            intervencions++;
-            document.getElementById("comptadorIntervencions").innerText = intervencions;
-            reiniciarTemps(); // Opcional: reinicia el rellotge cada vegada que parlen de nou
-        }
-    </script>
+                    <div class="time-display" id="temps_${id}">00:00</div>
+                    <div class="btn-group">
+                        <button class="btn-ctrl btn-start" onclick="iniciarTemps('${id}')">▶ Iniciar</button>
+                        <button class="btn-ctrl btn-pause" onclick="pausarTemps('${id}')">⏸ Pausar</button>
+                        <button class="btn-ctrl btn-reset" onclick="reiniciarTemps('${id}')">⏹ Rellotge a zero</button>
+                    </div>
+                </div>
+            `;
 
-</body>
-</html>
+            // Afegim la targeta al contenidor visual
+            document.getElementById("contenidorParticipants").insertAdjacentHTML('beforeend', targetaHTML);
+            
+            // Netegem l'input per al següent nom
+            input.value =
